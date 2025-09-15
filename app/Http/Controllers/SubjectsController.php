@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subjects;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class SubjectsController extends Controller
 {
@@ -12,8 +14,16 @@ class SubjectsController extends Controller
      */
     public function index()
     {
-        $subjects = Subjects::with('career')->get();
-        return response()->json($subjects);
+        try {
+            $subjects = Subjects::with('career')->get();
+            return response()->json($subjects);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las asignaturas',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     
@@ -30,8 +40,30 @@ class SubjectsController extends Controller
      */
     public function store(Request $request)
     {
-        $subject = Subjects::create($request->all());
-        return response()->json($subject, 201);
+        try {
+            $request->validate(([
+                'subject_name' => 'required|string|max:255|unique:subjects,subject_name',
+                'career_id' => 'required|int'
+            ]));
+            $subject = Subjects::create($request->all());
+            return response()->json([
+                'message' => 'Asignatura creada exitosamente',
+                'data' => $subject
+            ], 201);
+        
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'No se pudo crear la asignatura, verifique la validez de los datos enviados',
+                'error' => $e->validator->errors()
+            ], 422);
+        }
+
+        catch(Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo crear la asignatura',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -55,9 +87,30 @@ class SubjectsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $subject = Subjects::find($id);
-        $subject->update($request->all());
-        return response()->json($subject, 200);
+        try {
+            $request->validate(([
+                'subject_name' => 'required|string|max:255',
+                'career_id' => 'required|int'
+            ]));
+            $subject = Subjects::find($id);
+            $subject->update($request->all());
+            return response()->json([
+                'message' => 'Asignatura actualizada exitosamente',
+                'data' => $subject
+            ], 200);
+        
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'No se pudo actualizar la asignatura, verifique la validez de los datos enviados',
+                'error' => $e->validator->errors()
+            ], 422);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo actualizar la asignatura',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -65,8 +118,19 @@ class SubjectsController extends Controller
      */
     public function destroy($id)
     {
-        $subject = Subjects::find($id);
-        $subject->delete();
-        return response()->json($subject, 200);
+        try {
+            $subject = Subjects::find($id);
+            $subject->delete();
+            return response()->json([
+                'message' => 'Asignatura eliminada exitosamente',
+                'data' => $subject
+            ], 200);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo eliminar la asignatura',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

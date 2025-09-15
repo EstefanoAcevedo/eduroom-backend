@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Careers;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CareersController extends Controller
 {
@@ -12,8 +14,16 @@ class CareersController extends Controller
      */
     public function index()
     {
-        $careers = Careers::all();
-        return response()->json($careers);
+        try {
+            $careers = Careers::all();
+            return response()->json($careers);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las carreras',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -29,8 +39,29 @@ class CareersController extends Controller
      */
     public function store(Request $request)
     {
-        $career = Careers::create($request->all());
-        return response()->json($career, 201);
+        try {
+            $request->validate(([
+                'career_name' => 'required|string|max:255|unique:careers,career_name',
+                'career_alias' => 'required|string|max:10|unique:careers,career_alias',
+            ]));
+            $career = Careers::create($request->all());
+            return response()->json([
+                'message' => 'Carrera creada exitosamente',
+                'data' => $career,
+            ], 201);
+        
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'No se pudo crear la carrera, verifique la validez de los datos enviados',
+                'error' => $e->validator->errors()
+            ], 422);
+        
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo crear la carrera',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -54,9 +85,30 @@ class CareersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $career = Careers::find($id);
-        $career->update($request->all());
-        return response()->json($career, 200);
+        try {
+            $request->validate(([
+                'career_name' => 'required|string|max:255',
+                'career_alias' => 'required|string|max:10',
+            ]));
+            $career = Careers::find($id);
+            $career->update($request->all());
+            return response()->json([
+                'message' => 'Carrera actualizada exitosamente',
+                'data' => $career
+            ], 200);
+        
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'No se pudo actualizar la carrera, verifique la validez de los datos',
+                'error' => $e->validator->errors()
+            ], 422);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo actualizar la carrera',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -64,13 +116,35 @@ class CareersController extends Controller
      */
     public function destroy($id)
     {
-        $career = Careers::find($id);
-        $career->delete();
-        return response()->json($career, 200);
+        try {
+            $career = Careers::find($id);
+            $career->delete();
+            return response()->json([
+                'message' => 'Carrera eliminada exitosamente',
+                'data' => $career
+            ], 200);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo eliminar la carrera',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
+    /** 
+     * Show the list of careers and their subjects
+     */
     public function showWithSubjects()
     {
-        return Careers::with('subjects')->get();
+        try {
+            return Careers::with('subjects')->get();
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las carreras y asignaturas',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
