@@ -4,23 +4,33 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens, HasRoles;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
+    protected $table = 'users';
+    protected $primaryKey = 'user_id';
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'user_cuil',
+        'user_email',
+        'user_pass',
+        'user_lastname',
+        'user_name',
+        'user_tel',
+        'user_address',
+        'user_location',
     ];
 
     /**
@@ -45,4 +55,5 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
 }
