@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Enrollments;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -69,9 +70,23 @@ class EnrollmentsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Enrollments $enrollments)
+    public function show($id)
     {
-        //
+        try {
+            $enrollment = Enrollments::findOrFail($id);
+            return response()->json($enrollment);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'La inscripción solicitada no existe'
+            ], 404);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo obtener la inscripción',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -94,7 +109,7 @@ class EnrollmentsController extends Controller
                 'subject_id' => 'required|int',
                 'commission_id' => 'required|int'
             ]));
-            $enrollment = Enrollments::find($id);
+            $enrollment = Enrollments::findOrFail($id);
             $enrollment->update($request->all());
             return response()->json([
                 'message' => 'Inscripción actualizada exitosamente',
@@ -107,6 +122,11 @@ class EnrollmentsController extends Controller
                 'error' => $e->validator->errors()
             ], 422);
         
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'La inscripción solicitada no existe'
+            ], 404);
+
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar la inscripción',
@@ -121,13 +141,18 @@ class EnrollmentsController extends Controller
     public function destroy($id)
     {
         try {
-            $enrollment = Enrollments::find($id);
+            $enrollment = Enrollments::findOrFail($id);
             $enrollment->delete();
             return response()->json([
                 'message' => 'Inscripción eliminada exitosamente',
                 'data' => $enrollment,
             ], 200);
         
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'La inscripción solicitada no existe'
+            ], 404);
+
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo eliminar la inscripción',

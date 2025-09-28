@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Careers;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -67,9 +68,23 @@ class CareersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Careers $careers)
+    public function show($id)
     {
-        //
+        try {
+            $career = Careers::findOrFail($id);
+            return response()->json($career);
+        
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'La carrera solicitada no existe'
+            ], 404);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo obtener la carrera',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -77,7 +92,7 @@ class CareersController extends Controller
      */
     public function edit(Careers $careers)
     {
-        //
+        
     }
 
     /**
@@ -90,7 +105,7 @@ class CareersController extends Controller
                 'career_name' => 'required|string|max:255',
                 'career_alias' => 'required|string|max:10',
             ]));
-            $career = Careers::find($id);
+            $career = Careers::findOrFail($id);
             $career->update($request->all());
             return response()->json([
                 'message' => 'Carrera actualizada exitosamente',
@@ -103,6 +118,11 @@ class CareersController extends Controller
                 'error' => $e->validator->errors()
             ], 422);
         
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'La carrera solicitada no existe'
+            ], 404);
+
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar la carrera',
@@ -117,13 +137,18 @@ class CareersController extends Controller
     public function destroy($id)
     {
         try {
-            $career = Careers::find($id);
+            $career = Careers::findOrFail($id);
             $career->delete();
             return response()->json([
                 'message' => 'Carrera eliminada exitosamente',
                 'data' => $career
             ], 200);
-        
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'La carrera solicitada no existe'
+            ], 404);
+
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo eliminar la carrera',
