@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id('enrollment_id');
             $table->year('enrollment_academic_year');
+            $table->boolean('enrollment_is_approved')->default(false);
             $table->foreignId('user_id')->references('user_id')->on('users')->constrained()->onDelete('cascade');
             $table->foreignId('subject_id')->references('subject_id')->on('subjects')->constrained()->onDelete('cascade');
             $table->foreignId('commission_id')->references('commission_id')->on('commissions')->constrained()->onDelete('cascade');

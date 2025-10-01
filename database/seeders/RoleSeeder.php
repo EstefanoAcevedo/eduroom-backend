@@ -39,7 +39,7 @@ class RoleSeeder extends Seeder
                 'user_location' => 'Nogoyá, Entre Ríos. Argentina',
             ]
         );
-        $admin->assignRole('Admin');
+        $admin->assignRole($adminRole);
 
         // Create an example Profesor user
         $teacher = User::firstOrCreate(
@@ -54,7 +54,7 @@ class RoleSeeder extends Seeder
                 'user_location' => 'Victoria, Entre Ríos. Argentina',
             ]
         );
-        $teacher->assignRole('Teacher');
+        $teacher->assignRole($teacherRole);
 
         // Create an example Estudiante user
         $student = User::firstOrCreate(
@@ -69,7 +69,7 @@ class RoleSeeder extends Seeder
                 'user_location' => 'Nogoyá, Entre Ríos. Argentina',
             ]
         );
-        $student->assignRole('Student');
+        $student->assignRole($studentRole);
 
         $this->command->info('Roles and initial users created successfully!');
     }
