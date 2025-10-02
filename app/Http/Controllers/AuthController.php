@@ -43,7 +43,19 @@ class AuthController extends Controller
                 'message' => 'Usuario registrado exitosamente',
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => $user,
+                'user' => [
+                    "user_cuil" => $user->user_cuil,
+                    "user_email" => $user->user_email,
+                    "user_lastname" => $user->user_lastname,
+                    "user_name" => $user->user_name,
+                    "user_tel" => $user->user_tel,
+                    "user_address" => $user->user_address,
+                    "user_location" => $user->user_location,
+                    "updated_at" => $user->updated_at,
+                    "created_at" => $user->created_at,
+                    "user_id" => $user->user_id,
+                    "roles" => $user->getRoleNames(),
+                ],
             ], 201);
         
         } catch (ValidationException $e) {
@@ -81,8 +93,19 @@ class AuthController extends Controller
             return response()->json([
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => $user,
-                'roles' => $user->getRoleNames(), // Get roles
+                'user' => [
+                    "user_cuil" => $user->user_cuil,
+                    "user_email" => $user->user_email,
+                    "user_lastname" => $user->user_lastname,
+                    "user_name" => $user->user_name,
+                    "user_tel" => $user->user_tel,
+                    "user_address" => $user->user_address,
+                    "user_location" => $user->user_location,
+                    "updated_at" => $user->updated_at,
+                    "created_at" => $user->created_at,
+                    "user_id" => $user->user_id,
+                    "roles" => $user->getRoleNames(),
+                ],
             ]);
         
         } catch (ValidationException $e) {
