@@ -72,9 +72,9 @@ class AuthController extends Controller
             ]);
             $user = User::where('user_email', $request->user_email)->first();
             if (! $user || ! Hash::check($request->user_pass, $user->user_pass)) {
-                throw ValidationException::withMessages([
-                    'message' => ['Credenciales inválidas'],
-                ]);
+                return response()->json([
+                    'message' => 'Credenciales inválidas',
+                ], 401);
             }
             $user->tokens()->delete();  // Revoke old tokens to ensure only one active token per login for simplicity
             $token = $user->createToken('auth_token')->plainTextToken;
