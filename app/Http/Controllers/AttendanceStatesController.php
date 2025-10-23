@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Enrollments;
+use App\Models\AttendanceStates;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class EnrollmentsController extends Controller
+class AttendanceStatesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,12 +16,12 @@ class EnrollmentsController extends Controller
     public function index()
     {
         try {
-            $enrollments = Enrollments::all();
-            return response()->json($enrollments);
+            $attendanceStates = AttendanceStates::all();
+            return response()->json($attendanceStates);
         
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudieron obtener las inscripciones',
+                'message' => 'No se pudieron obtener los estados de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -42,27 +42,24 @@ class EnrollmentsController extends Controller
     {
         try {
             $request->validate(([
-                'enrollment_academic_year' => 'required|date_format:Y',
-                'enrollment_is_approved' => 'required|boolean',
-                'user_id' => 'required|int',
-                'subject_id' => 'required|int',
-                'commission_id' => 'required|int'
+                'attendance_state_name' => 'required|string|max:20',
+                'attendance_state_value' => 'required|numeric|between:0,9.99',
             ]));
-            $enrollment = Enrollments::create($request->all());
+            $attendanceState = AttendanceStates::create($request->all());
             return response()->json([
-                'message' => 'Inscripción creada exitosamente',
-                'data' => $enrollment,
+                'message' => 'Estado de asistencia creado exitosamente',
+                'data' => $attendanceState,
             ], 201);
         
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'No se pudo crear la inscripción, verifique la validez de los datos enviados',
+                'message' => 'No se pudo crear el estado de asistencia, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
         
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'No se pudo crear la inscripción',
+                'message' => 'No se pudo crear el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -74,17 +71,17 @@ class EnrollmentsController extends Controller
     public function show($id)
     {
         try {
-            $enrollment = Enrollments::findOrFail($id);
-            return response()->json($enrollment);
-
+            $attendanceState = AttendanceStates::findOrFail($id);
+            return response()->json($attendanceState);
+        
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'La inscripción solicitada no existe'
+                'message' => 'El estado de asistencia solicitado no existe'
             ], 404);
 
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudo obtener la inscripción',
+                'message' => 'No se pudo obtener el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -93,7 +90,7 @@ class EnrollmentsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Enrollments $enrollments)
+    public function edit(AttendanceStates $attendanceStates)
     {
         //
     }
@@ -105,33 +102,30 @@ class EnrollmentsController extends Controller
     {
         try {
             $request->validate(([
-                'enrollment_academic_year' => 'required|date_format:Y',
-                'enrollment_is_approved' => 'required|boolean',
-                'user_id' => 'required|int',
-                'subject_id' => 'required|int',
-                'commission_id' => 'required|int'
+                'attendance_state_name' => 'required|string|max:20',
+                'attendance_state_value' => 'required|numeric|between:0,9.99',
             ]));
-            $enrollment = Enrollments::findOrFail($id);
-            $enrollment->update($request->all());
+            $attendanceState = AttendanceStates::findOrFail($id);
+            $attendanceState->update($request->all());
             return response()->json([
-                'message' => 'Inscripción actualizada exitosamente',
-                'data' => $enrollment,
-            ], 201);
+                'message' => 'Estado de asistencia actualizado exitosamente',
+                'data' => $attendanceState
+            ], 200);
         
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'No se pudo actualizar la inscripción, verifique la validez de los datos enviados',
+                'message' => 'No se pudo actualizar el estado de asistencia, verifique la validez de los datos',
                 'error' => $e->validator->errors()
             ], 422);
         
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'La inscripción solicitada no existe'
+                'message' => 'El estado de asistencia solicitado no existe'
             ], 404);
 
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudo actualizar la inscripción',
+                'message' => 'No se pudo actualizar el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -143,21 +137,21 @@ class EnrollmentsController extends Controller
     public function destroy($id)
     {
         try {
-            $enrollment = Enrollments::findOrFail($id);
-            $enrollment->delete();
+            $attendanceState = AttendanceStates::findOrFail($id);
+            $attendanceState->delete();
             return response()->json([
-                'message' => 'Inscripción eliminada exitosamente',
-                'data' => $enrollment,
+                'message' => 'Estado de asistencia eliminado exitosamente',
+                'data' => $attendanceState
             ], 200);
-        
+
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'La inscripción solicitada no existe'
+                'message' => 'El estado de asistencia solicitado no existe'
             ], 404);
 
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudo eliminar la inscripción',
+                'message' => 'No se pudo eliminar el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
