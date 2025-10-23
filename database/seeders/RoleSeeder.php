@@ -31,7 +31,7 @@ class RoleSeeder extends Seeder
             ['user_email' => 'admin@example.com'],
             [
                 'user_cuil' => '20436319739',
-                'user_pass' => Hash::make('admin'),
+                'user_pass' => Hash::make('admin1234'),
                 'user_lastname' => 'Acevedo',
                 'user_name' => 'Estéfano Marcial',
                 'user_tel' => '3435458494',
@@ -46,7 +46,7 @@ class RoleSeeder extends Seeder
             ['user_email' => 'teacher@example.com'],
             [
                 'user_cuil' => '20365168882',
-                'user_pass' => Hash::make('teacher'),
+                'user_pass' => Hash::make('teacher1234'),
                 'user_lastname' => 'Bracamonte',
                 'user_name' => 'Adrián Alejandro',
                 'user_tel' => '3436575198',
@@ -61,7 +61,7 @@ class RoleSeeder extends Seeder
             ['user_email' => 'student@example.com'],
             [
                 'user_cuil' => '20564528802',
-                'user_pass' => Hash::make('student'),
+                'user_pass' => Hash::make('student1234'),
                 'user_lastname' => 'Alfáro',
                 'user_name' => 'Thiago Valentino',
                 'user_tel' => '3435454222',
