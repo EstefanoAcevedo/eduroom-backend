@@ -61,9 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
     /* Attendances Routes */
     Route::prefix('attendances')->group(function () {
         Route::get('/', [AttendancesController::class, 'index'])->middleware('role:Admin|Teacher|Student');
-        Route::post('/', [AttendancesController::class, 'store'])->middleware('role:Admin');
+        Route::post('/', [AttendancesController::class, 'store'])->middleware('role:Admin|Teacher');
         Route::get('/{id}', [AttendancesController::class, 'show'])->middleware('role:Admin|Teacher|Student');
-        Route::put('/{id}', [AttendancesController::class, 'update'])->middleware('role:Admin');
+        Route::put('/{id}', [AttendancesController::class, 'update'])->middleware('role:Admin|Teacher');
         Route::delete('/{id}', [AttendancesController::class, 'destroy'])->middleware('role:Admin');
     });
 

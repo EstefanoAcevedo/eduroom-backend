@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('attendance_states', function (Blueprint $table) {
             $table->id('attendance_state_id');
             $table->string('attendance_state_name')->unique();
-            $table->string('attendance_state_value')->unique();
+            $table->double('attendance_state_value')->unique();
             $table->timestamps();
         });
     }
