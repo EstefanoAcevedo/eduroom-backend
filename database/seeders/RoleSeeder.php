@@ -70,7 +70,5 @@ class RoleSeeder extends Seeder
             ]
         );
         $student->assignRole($studentRole);
-
-        $this->command->info('Roles and initial users created successfully!');
     }
 }

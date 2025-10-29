@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             CareersSubjectsSeeder::class,
             CommissionsSeeder::class,
             AttendanceStatesSeeder::class,
+            EnrollmentsSeeder::class,
+            AttendancesSeeder::class,
         ]);
     }
 }
