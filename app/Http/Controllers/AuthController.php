@@ -80,7 +80,7 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'user_email' => 'string|required|max:255',
-                'user_pass' => 'string|required|max:255',
+                'user_pass' => 'string|required|max:255|min:8',
             ]);
             $user = User::where('user_email', $request->user_email)->first();
             if (! $user || ! Hash::check($request->user_pass, $user->user_pass)) {

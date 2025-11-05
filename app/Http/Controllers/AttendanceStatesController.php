@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Subjects;
+use App\Models\AttendanceStates;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class SubjectsController extends Controller
+class AttendanceStatesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,18 +16,17 @@ class SubjectsController extends Controller
     public function index()
     {
         try {
-            $subjects = Subjects::with('career')->get();
-            return response()->json($subjects);
+            $attendanceStates = AttendanceStates::all();
+            return response()->json($attendanceStates);
         
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudieron obtener las asignaturas',
+                'message' => 'No se pudieron obtener los estados de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    
     /**
      * Show the form for creating a new resource.
      */
@@ -43,25 +42,24 @@ class SubjectsController extends Controller
     {
         try {
             $request->validate(([
-                'subject_name' => 'required|string|max:255|unique:subjects,subject_name',
-                'career_id' => 'required|int'
+                'attendance_state_name' => 'required|string|max:20',
+                'attendance_state_value' => 'required|numeric|between:0,9.99',
             ]));
-            $subject = Subjects::create($request->all());
+            $attendanceState = AttendanceStates::create($request->all());
             return response()->json([
-                'message' => 'Asignatura creada exitosamente',
-                'data' => $subject
+                'message' => 'Estado de asistencia creado exitosamente',
+                'data' => $attendanceState,
             ], 201);
         
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'No se pudo crear la asignatura, verifique la validez de los datos enviados',
+                'message' => 'No se pudo crear el estado de asistencia, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        }
-
-        catch(Exception $e) {
+        
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'No se pudo crear la asignatura',
+                'message' => 'No se pudo crear el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -73,17 +71,17 @@ class SubjectsController extends Controller
     public function show($id)
     {
         try {
-            $subject = Subjects::findOrFail($id);
-            return response()->json($subject);
+            $attendanceState = AttendanceStates::findOrFail($id);
+            return response()->json($attendanceState);
         
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'La asignatura solicitada no existe'
+                'message' => 'El estado de asistencia solicitado no existe'
             ], 404);
-        
+
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudo obtener la asignatura',
+                'message' => 'No se pudo obtener el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -92,7 +90,7 @@ class SubjectsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Subjects $subjects)
+    public function edit(AttendanceStates $attendanceStates)
     {
         //
     }
@@ -104,30 +102,30 @@ class SubjectsController extends Controller
     {
         try {
             $request->validate(([
-                'subject_name' => 'required|string|max:255',
-                'career_id' => 'required|int'
+                'attendance_state_name' => 'required|string|max:20',
+                'attendance_state_value' => 'required|numeric|between:0,9.99',
             ]));
-            $subject = Subjects::findOrFail($id);
-            $subject->update($request->all());
+            $attendanceState = AttendanceStates::findOrFail($id);
+            $attendanceState->update($request->all());
             return response()->json([
-                'message' => 'Asignatura actualizada exitosamente',
-                'data' => $subject
+                'message' => 'Estado de asistencia actualizado exitosamente',
+                'data' => $attendanceState
             ], 200);
         
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'No se pudo actualizar la asignatura, verifique la validez de los datos enviados',
+                'message' => 'No se pudo actualizar el estado de asistencia, verifique la validez de los datos',
                 'error' => $e->validator->errors()
             ], 422);
         
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'La asignatura solicitada no existe'
+                'message' => 'El estado de asistencia solicitado no existe'
             ], 404);
 
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudo actualizar la asignatura',
+                'message' => 'No se pudo actualizar el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -139,42 +137,21 @@ class SubjectsController extends Controller
     public function destroy($id)
     {
         try {
-            $subject = Subjects::findOrFail($id);
-            $subject->delete();
+            $attendanceState = AttendanceStates::findOrFail($id);
+            $attendanceState->delete();
             return response()->json([
-                'message' => 'Asignatura eliminada exitosamente',
-                'data' => $subject
+                'message' => 'Estado de asistencia eliminado exitosamente',
+                'data' => $attendanceState
             ], 200);
-        
+
         } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'La asignatura solicitada no existe'
+                'message' => 'El estado de asistencia solicitado no existe'
             ], 404);
-        
+
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'No se pudo eliminar la asignatura',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /* 
-
-    */
-    public function showSubjectsByCareer_id($career_id) {
-        try {
-            $subjects = Subjects::where('career_id', $career_id)->get();
-            if ($subjects->isEmpty()) {
-                return response()->json([
-                    'message' => 'No se encontraron asignaturas para la carrera solicitada'
-                ], 404);
-            }
-            return response()->json($subjects);
-            
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'No se pudieron obtener las asignaturas',
+                'message' => 'No se pudo eliminar el estado de asistencia',
                 'error' => $e->getMessage()
             ], 500);
         }

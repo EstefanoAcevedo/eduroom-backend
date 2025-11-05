@@ -43,6 +43,7 @@ class EnrollmentsController extends Controller
         try {
             $request->validate(([
                 'enrollment_academic_year' => 'required|date_format:Y',
+                'enrollment_is_approved' => 'required|boolean',
                 'user_id' => 'required|int',
                 'subject_id' => 'required|int',
                 'commission_id' => 'required|int'
@@ -105,6 +106,7 @@ class EnrollmentsController extends Controller
         try {
             $request->validate(([
                 'enrollment_academic_year' => 'required|date_format:Y',
+                'enrollment_is_approved' => 'required|boolean',
                 'user_id' => 'required|int',
                 'subject_id' => 'required|int',
                 'commission_id' => 'required|int'
