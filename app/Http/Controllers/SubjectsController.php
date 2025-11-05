@@ -158,4 +158,25 @@ class SubjectsController extends Controller
             ], 500);
         }
     }
+
+    /* 
+
+    */
+    public function showSubjectsByCareer_id($career_id) {
+        try {
+            $subjects = Subjects::where('career_id', $career_id)->get();
+            if ($subjects->isEmpty()) {
+                return response()->json([
+                    'message' => 'No se encontraron asignaturas para la carrera solicitada'
+                ], 404);
+            }
+            return response()->json($subjects);
+            
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las asignaturas',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

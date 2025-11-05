@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [SubjectsController::class, 'update'])->middleware('role:Admin');
         Route::delete('/{id}', [SubjectsController::class, 'destroy'])->middleware('role:Admin');
     });
+    Route::get('subjects-by-career/{career_id}', [SubjectsController::class, 'showSubjectsByCareer_id'])->middleware('role:Admin|Teacher|Student');
 
     /* Commissions Routes */
     Route::prefix('commissions')->group(function () {
