@@ -165,7 +165,7 @@ class EnrollmentsController extends Controller
 
     public function showPendingEnrollments() {
         try {
-            $enrollments = Enrollments::where('enrollment_status', 'pending')->get();
+            $enrollments = Enrollments::where('enrollment_status', 'pending')->with(['user:user_id,user_name,user_lastname', 'subject:subject_id,subject_name', 'commission:commission_id,commission_name'])->get();
             return response()->json($enrollments);
         
         } catch (Exception $e) {
