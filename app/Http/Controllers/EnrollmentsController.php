@@ -43,7 +43,7 @@ class EnrollmentsController extends Controller
         try {
             $request->validate(([
                 'enrollment_academic_year' => 'required|date_format:Y',
-                'enrollment_is_approved' => 'required|boolean',
+                'enrollment_status' => 'required|in:pending,approved,rejected',
                 'user_id' => 'required|int',
                 'subject_id' => 'required|int',
                 'commission_id' => 'required|int'
@@ -106,7 +106,7 @@ class EnrollmentsController extends Controller
         try {
             $request->validate(([
                 'enrollment_academic_year' => 'required|date_format:Y',
-                'enrollment_is_approved' => 'required|boolean',
+                'enrollment_status' => 'required|in:pending,approved,rejected',
                 'user_id' => 'required|int',
                 'subject_id' => 'required|int',
                 'commission_id' => 'required|int'
@@ -158,6 +158,19 @@ class EnrollmentsController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo eliminar la inscripción',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function showPendingEnrollments() {
+        try {
+            $enrollments = Enrollments::where('enrollment_status', 'pending')->get();
+            return response()->json($enrollments);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las inscripciones pendientes',
                 'error' => $e->getMessage()
             ], 500);
         }

@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{id}', [EnrollmentsController::class, 'update'])->middleware('role:Admin');
         Route::delete('/{id}', [EnrollmentsController::class, 'destroy'])->middleware('role:Admin');
     });
+    Route::get('enrollments-pending', [EnrollmentsController::class, 'showPendingEnrollments'])->middleware('role:Admin');
 
     /* Attendances Routes */
     Route::prefix('attendances')->group(function () {
