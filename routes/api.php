@@ -8,6 +8,7 @@ use App\Http\Controllers\CommissionsController;
 use App\Http\Controllers\EnrollmentsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SubjectsController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* Logout */
     Route::post('logout', [AuthController::class, 'logout']);
+
+    /* Users Routes */
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UsersController::class, 'index'])->middleware('role:Admin');
+        Route::get('/{id}', [UsersController::class, 'show'])->middleware('role:Admin');
+        Route::put('/{id}', [UsersController::class, 'update'])->middleware('role:Admin');
+        Route::delete('/{id}', [UsersController::class, 'destroy'])->middleware('role:Admin');
+    });
 
     /* Careers Routes */
     Route::prefix('careers')->group(function () {
