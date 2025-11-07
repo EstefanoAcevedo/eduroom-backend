@@ -17,21 +17,21 @@ class UsersController extends Controller
     {
         try {
             $users = User::all()->map(function ($user) {
-            return [
-                "user_id" => $user->user_id,
-                "user_email" => $user->user_email,
-                "user_lastname" => $user->user_lastname,
-                "user_name" => $user->user_name,
-                "user_cuil" => $user->user_cuil,
-                "user_tel" => $user->user_tel,
-                "user_address" => $user->user_address,
-                "user_location" => $user->user_location,
-                "updated_at" => $user->updated_at,
-                "created_at" => $user->created_at,
-                "roles" => $user->getRoleNames(),
-            ];
-        });
-        return response()->json($users, 200);
+                return [
+                    "user_id" => $user->user_id,
+                    "user_email" => $user->user_email,
+                    "user_lastname" => $user->user_lastname,
+                    "user_name" => $user->user_name,
+                    "user_cuil" => $user->user_cuil,
+                    "user_tel" => $user->user_tel,
+                    "user_address" => $user->user_address,
+                    "user_location" => $user->user_location,
+                    "updated_at" => $user->updated_at,
+                    "created_at" => $user->created_at,
+                    "roles" => $user->getRoleNames(),
+                ];
+            });
+            return response()->json($users, 200);
 
         } catch (Exception $e) {
             return response()->json([
