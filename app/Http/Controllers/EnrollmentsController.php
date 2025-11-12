@@ -165,4 +165,37 @@ class EnrollmentsController extends Controller
             ], 500);
         }
     }
+
+    public function mySubjects(Request $request)
+    {
+        try {
+            $user = $request->user(); // viene del token Sanctum
+            $userId = $user->user_id;
+
+            $enrollments = Enrollments::where('user_id', $userId)
+                ->where('enrollment_status', 'approved')
+                ->with([
+                    'subject:subject_id,subject_name',
+                    'commission:commission_id,commission_name',
+                ])
+                ->get();
+
+            // Formato simplificado para el front
+            $subjects = $enrollments->map(function ($enrollment) {
+                return [
+                    'subject_id'      => $enrollment->subject->subject_id,
+                    'subject_name'    => $enrollment->subject->subject_name,
+                    'commission_id'   => $enrollment->commission->commission_id,
+                    'commission_name' => $enrollment->commission->commission_name,
+                ];
+            });
+
+            return response()->json($subjects->values());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las materias del estudiante',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
