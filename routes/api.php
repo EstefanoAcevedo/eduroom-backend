@@ -87,6 +87,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [AttendanceStatesController::class, 'destroy'])->middleware('role:Admin');
     });
 
+    /*Enrollments routes*/
+    route::prefix('enrollments')->group(function () {
+        Route::get('/', [EnrollmentsController::class, 'index'])->middleware('role:Admin|Teacher|Studentent');
+        Route::post('/', [EnrollmentsController::class, 'store'])->middleware('role:Admin|Student');
+        Route::get('/{id}', [EnrollmentsController::class, 'show'])->middleware('role:Admin|Teacher|Student');
+        Route::put('/{id}', [EnrollmentsController::class, 'update'])->middleware('role:Admin');
+        Route::delete('/{id}', [EnrollmentsController::class, 'destoy'])->middleware('role:Admin');
+    });
+    Route::get('enrollments-pending', [EnrollmentsController::class, 'showPendingEnrollments'])->middleware('role:Admin');
+
+    /* NUEVA RUTA: materias del estudiante logueado */
+    Route::get('my-subjects', [EnrollmentsController::class, 'mySubjects'])->middleware('role:Student');
 });
 
 /* Public Routes (No authentication required) */

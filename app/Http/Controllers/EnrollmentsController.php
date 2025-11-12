@@ -18,7 +18,6 @@ class EnrollmentsController extends Controller
         try {
             $enrollments = Enrollments::all();
             return response()->json($enrollments);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudieron obtener las inscripciones',
@@ -53,13 +52,11 @@ class EnrollmentsController extends Controller
                 'message' => 'Inscripción creada exitosamente',
                 'data' => $enrollment,
             ], 201);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudo crear la inscripción, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo crear la inscripción',
@@ -76,12 +73,10 @@ class EnrollmentsController extends Controller
         try {
             $enrollment = Enrollments::findOrFail($id);
             return response()->json($enrollment);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'La inscripción solicitada no existe'
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo obtener la inscripción',
@@ -117,18 +112,15 @@ class EnrollmentsController extends Controller
                 'message' => 'Inscripción actualizada exitosamente',
                 'data' => $enrollment,
             ], 201);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar la inscripción, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'La inscripción solicitada no existe'
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar la inscripción',
@@ -149,12 +141,10 @@ class EnrollmentsController extends Controller
                 'message' => 'Inscripción eliminada exitosamente',
                 'data' => $enrollment,
             ], 200);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'La inscripción solicitada no existe'
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo eliminar la inscripción',
@@ -163,15 +153,48 @@ class EnrollmentsController extends Controller
         }
     }
 
-    public function showPendingEnrollments() {
+    public function showPendingEnrollments()
+    {
         try {
             $enrollments = Enrollments::where('enrollment_status', 'pending')->with(['user:user_id,user_name,user_lastname', 'subject:subject_id,subject_name', 'commission:commission_id,commission_name'])->get();
             return response()->json($enrollments);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudieron obtener las inscripciones pendientes',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function mySubjects(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $userId = $user->user_id;
+
+            $enrollments = Enrollments::where('user_id', $userId)
+                ->where('enrollment_status', 'approved')
+                ->with([
+                    'subject:subject_id,subject_name',
+                    'commission:commission_id,commission_name',
+                ])
+                ->get();
+
+            // Formato simplificado para el front
+            $subjects = $enrollments->map(function ($enrollment) {
+                return [
+                    'subject_id'      => $enrollment->subject->subject_id,
+                    'subject_name'    => $enrollment->subject->subject_name,
+                    'commission_id'   => $enrollment->commission->commission_id,
+                    'commission_name' => $enrollment->commission->commission_name,
+                ];
+            });
+
+            return response()->json($subjects->values());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las materias del estudiante',
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
