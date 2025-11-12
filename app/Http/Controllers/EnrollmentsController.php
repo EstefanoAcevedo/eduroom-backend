@@ -154,7 +154,7 @@ class EnrollmentsController extends Controller
             return response()->json([
                 'message' => 'La inscripción solicitada no existe'
             ], 404);
-
+        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo eliminar la inscripción',
@@ -171,6 +171,27 @@ class EnrollmentsController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudieron obtener las inscripciones pendientes',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Retorna las inscripciones según el año académico, el ID de la materia y el ID de la comisión
+    */
+    public function showApprovedEnrollmentsBySubjectIdAndCommissionIdAndAcademicYear($subject_id, $commission_id, $academic_year) {
+        try {
+            $enrollments = Enrollments::where('subject_id', $subject_id)
+                ->where('commission_id', $commission_id)
+                ->where('enrollment_academic_year', $academic_year)
+                ->where('enrollment_status', 'approved')
+                ->with(['user:user_id,user_name,user_lastname'])
+                ->get();
+            return response()->json($enrollments);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'No se pudieron obtener las inscripciones para la materia, comisión y año académico especificados',
                 'error' => $e->getMessage()
             ], 500);
         }

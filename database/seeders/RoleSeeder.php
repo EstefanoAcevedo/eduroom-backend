@@ -70,5 +70,33 @@ class RoleSeeder extends Seeder
             ]
         );
         $student->assignRole($studentRole);
+
+        $student2 = User::firstOrCreate(
+            ['user_email' => 'student2@example.com'],
+            [
+                'user_cuil' => '20564521802',
+                'user_pass' => Hash::make('student1234'),
+                'user_lastname' => 'Morales',
+                'user_name' => 'Ulises',
+                'user_tel' => '3435457710',
+                'user_address' => 'Mantegazza 1282',
+                'user_location' => 'Nogoyá, Entre Ríos. Argentina',
+            ]
+        );
+        $student2->assignRole($studentRole);
+
+        $student3 = User::firstOrCreate(
+            ['user_email' => 'student3@example.com'],
+            [
+                'user_cuil' => '22564528802',
+                'user_pass' => Hash::make('student1234'),
+                'user_lastname' => 'Hernández',
+                'user_name' => 'Patricia',
+                'user_tel' => '3435453324',
+                'user_address' => '9 de Julio 123',
+                'user_location' => 'Nogoyá, Entre Ríos. Argentina',
+            ]
+        );
+        $student3->assignRole($studentRole);
     }
 }
