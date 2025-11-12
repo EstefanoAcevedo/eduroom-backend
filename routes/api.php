@@ -68,6 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [EnrollmentsController::class, 'destroy'])->middleware('role:Admin');
     });
     Route::get('enrollments-pending', [EnrollmentsController::class, 'showPendingEnrollments'])->middleware('role:Admin');
+    Route::get('/enrollments/{subject_id}/{commission_id}/{academic_year}', [EnrollmentsController::class, 'showApprovedEnrollmentsBySubjectIdAndCommissionIdAndAcademicYear'])->middleware('role:Admin|Teacher');
+
 
     /* Attendances Routes */
     Route::prefix('attendances')->group(function () {

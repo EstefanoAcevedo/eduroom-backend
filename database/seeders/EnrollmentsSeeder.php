@@ -13,6 +13,6 @@ class EnrollmentsSeeder extends Seeder
      */
     public function run(): void
     {
-        Enrollments::factory()->count(18)->create();
+        Enrollments::factory()->count(54)->create();
     }
 }
