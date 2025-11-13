@@ -42,7 +42,7 @@ class AttendancesController extends Controller
     {
         try {
             $request->validate(([
-                'attendance_date' => 'required',
+                'attendance_date' => 'required|date',
                 'attendance_is_justified' => 'required|boolean',
                 'attendance_state_id' => 'required|int',
                 'enrollment_id' => 'required|int'
@@ -104,7 +104,7 @@ class AttendancesController extends Controller
     {
         try {
             $request->validate(([
-                'attendance_date' => 'required',
+                'attendance_date' => 'required|date',
                 'attendance_is_justified' => 'required|boolean',
                 'attendance_state_id' => 'required|int',
                 'enrollment_id' => 'required|int'
@@ -160,4 +160,44 @@ class AttendancesController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Recibe un objeto con el valor attendance_date y un array de attendances para almacenarlas
+    */
+    public function storeMultipleAttendances(Request $request)
+    {
+        try {
+            $request->validate([
+                'attendance_date' => 'required|date',
+                'attendances' => 'required|array|min:1',
+                'attendances.*.attendance_is_justified' => 'required|boolean',
+                'attendances.*.attendance_state_id' => 'required|int',
+                'attendances.*.enrollment_id' => 'required|int',
+            ]);
+            $attendanceDate = $request->attendance_date;
+            $attendances = $request->attendances;
+            $savedAttendances = [];
+            foreach ($attendances as $attendance) {
+                $attendance['attendance_date'] = $attendanceDate;
+                $savedAttendances[] = Attendances::create($attendance);
+            }
+            return response()->json([
+                'message' => 'Asistencias registradas exitosamente',
+                'data' => $savedAttendances,
+            ], 201);
+        
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'No se pudieron registrar las asistencias, verifique los datos enviados',
+                'error' => $e->validator->errors()
+            ], 422);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Ocurrió un error al registrar las asistencias',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
