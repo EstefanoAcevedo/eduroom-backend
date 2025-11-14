@@ -81,6 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [AttendancesController::class, 'destroy'])->middleware('role:Admin');
     });
     Route::post('/store-multiple-attendances', [AttendancesController::class, 'storeMultipleAttendances'])->middleware('role:Admin|Teacher');
+    Route::get('/previous-attendances/{subject_id}/{commission_id}/{date}', [AttendancesController::class, 'showAttendancesBySubjectIdAndCommissionIdAndDate'])->middleware('role:Admin|Teacher');
 
     /* Attendance States Routes */
     Route::prefix('attendance_states')->group(function () {

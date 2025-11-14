@@ -200,4 +200,25 @@ class AttendancesController extends Controller
         }
     }
 
+    /**
+     * Retorna las asistencias según el Id de la materia, comisión y fecha
+    */
+    public function showAttendancesBySubjectIdAndCommissionIdAndDate($subject_id, $commission_id, $date) {
+        try {
+            $attendances = Attendances::whereHas('enrollment', function ($e) use ($subject_id, $commission_id) {
+                $e->where('subject_id', $subject_id)
+                    ->where('commission_id', $commission_id);
+                })
+                ->where('attendance_date', $date)
+                ->with('enrollment.user:user_id,user_name,user_lastname')
+                ->get();
+            return response()->json($attendances);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Ocurrió un error al recuperar las asistencias',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
