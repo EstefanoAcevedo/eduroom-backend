@@ -221,4 +221,47 @@ class AttendancesController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Recibe un objeto con el valor attendance_date y un array de attendances para actualizarlas  */
+    public function updateMultipleAttendances(Request $request)
+    {
+        try {
+            $request->validate([
+                'attendance_date' => 'required|date',
+                'attendances' => 'required|array|min:1',
+                'attendances.*.attendance_id' => 'required|int',
+                'attendances.*.attendance_is_justified' => 'required|boolean',
+                'attendances.*.attendance_state_id' => 'required|int',
+                'attendances.*.enrollment_id' => 'required|int',
+            ]);
+            $attendances = $request->attendances;
+            $updatedAttendances = [];
+            foreach ($attendances as $attendanceItem) {
+                $attendance = Attendances::findOrFail($attendanceItem['attendance_id']);
+                $updatedAttendances[] = $attendance->update($attendanceItem);
+            }
+            return response()->json([
+                'message' => 'Asistencias actualizadas exitosamente',
+                'data' => $updatedAttendances,
+            ], 200);
+        
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Un registro de asistencia solicitado no existe'
+            ], 404);
+        
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'No se pudieron actualizar las asistencias, verifique los datos enviados',
+                'error' => $e->validator->errors()
+            ], 422);
+        
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Ocurrió un error al actualizar las asistencias',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
