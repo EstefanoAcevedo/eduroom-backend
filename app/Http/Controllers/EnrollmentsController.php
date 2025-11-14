@@ -169,7 +169,7 @@ class EnrollmentsController extends Controller
     public function mySubjects(Request $request)
     {
         try {
-            $user = $request->user(); // viene del token Sanctum
+            $user = $request->user();
             $userId = $user->user_id;
 
             $enrollments = Enrollments::where('user_id', $userId)
