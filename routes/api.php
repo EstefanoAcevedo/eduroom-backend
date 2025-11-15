@@ -83,6 +83,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/store-multiple-attendances', [AttendancesController::class, 'storeMultipleAttendances'])->middleware('role:Admin|Teacher');
     Route::get('/previous-attendances/{subject_id}/{commission_id}/{date}', [AttendancesController::class, 'showAttendancesBySubjectIdAndCommissionIdAndDate'])->middleware('role:Admin|Teacher');
     Route::put('/update-multiple-attendances', [AttendancesController::class, 'updateMultipleAttendances'])->middleware('role:Admin|Teacher');
+    Route::get('my-attendances', [AttendancesController::class, 'myAttendances'])->middleware('role:Student');
 
     /* Attendance States Routes */
     Route::prefix('attendance_states')->group(function () {
@@ -93,6 +94,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [AttendanceStatesController::class, 'destroy'])->middleware('role:Admin');
     });
 
+
+
     /*Enrollments routes*/
     route::prefix('enrollments')->group(function () {
         Route::get('/', [EnrollmentsController::class, 'index'])->middleware('role:Admin|Teacher|Studentent');
@@ -102,7 +105,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{id}', [EnrollmentsController::class, 'destoy'])->middleware('role:Admin');
     });
     Route::get('enrollments-pending', [EnrollmentsController::class, 'showPendingEnrollments'])->middleware('role:Admin');
-
 });
 
 /* Public Routes (No authentication required) */

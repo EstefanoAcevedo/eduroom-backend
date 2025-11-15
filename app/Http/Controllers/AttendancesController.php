@@ -18,7 +18,6 @@ class AttendancesController extends Controller
         try {
             $attendance = Attendances::all();
             return response()->json($attendance);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudieron obtener los registros de asistencias',
@@ -52,13 +51,11 @@ class AttendancesController extends Controller
                 'message' => 'Asistencia registrada exitosamente',
                 'data' => $attendance,
             ], 201);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudo registrar la asistencia, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo registrar la asistencia',
@@ -75,12 +72,10 @@ class AttendancesController extends Controller
         try {
             $attendance = Attendances::findOrFail($id);
             return response()->json($attendance);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'El registro de asistencia solicitado no existe'
             ], 404);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo obtener el registro de asistencia',
@@ -115,18 +110,15 @@ class AttendancesController extends Controller
                 'message' => 'Registro de asistencia actualizado exitosamente',
                 'data' => $attendance
             ], 200);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar el registro de asistencia, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'El registro de asistencia solicitado no existe'
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar el registro de asistencia',
@@ -147,12 +139,10 @@ class AttendancesController extends Controller
                 'message' => 'Registro de asistencia eliminado exitosamente',
                 'data' => $attendance
             ], 200);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'El registro de asistencia solicitado no existe'
             ], 404);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo eliminar el registro de asistencia',
@@ -163,7 +153,7 @@ class AttendancesController extends Controller
 
     /**
      * Recibe un objeto con el valor attendance_date y un array de attendances para almacenarlas
-    */
+     */
     public function storeMultipleAttendances(Request $request)
     {
         try {
@@ -185,13 +175,11 @@ class AttendancesController extends Controller
                 'message' => 'Asistencias registradas exitosamente',
                 'data' => $savedAttendances,
             ], 201);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudieron registrar las asistencias, verifique los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Ocurrió un error al registrar las asistencias',
@@ -202,18 +190,18 @@ class AttendancesController extends Controller
 
     /**
      * Retorna las asistencias según el Id de la materia, comisión y fecha
-    */
-    public function showAttendancesBySubjectIdAndCommissionIdAndDate($subject_id, $commission_id, $date) {
+     */
+    public function showAttendancesBySubjectIdAndCommissionIdAndDate($subject_id, $commission_id, $date)
+    {
         try {
             $attendances = Attendances::whereHas('enrollment', function ($e) use ($subject_id, $commission_id) {
                 $e->where('subject_id', $subject_id)
                     ->where('commission_id', $commission_id);
-                })
+            })
                 ->where('attendance_date', $date)
                 ->with('enrollment.user:user_id,user_name,user_lastname')
                 ->get();
             return response()->json($attendances);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Ocurrió un error al recuperar las asistencias',
@@ -245,22 +233,59 @@ class AttendancesController extends Controller
                 'message' => 'Asistencias actualizadas exitosamente',
                 'data' => $updatedAttendances,
             ], 200);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Un registro de asistencia solicitado no existe'
             ], 404);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudieron actualizar las asistencias, verifique los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Ocurrió un error al actualizar las asistencias',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /// Retorna las asistencias del estudiante autenticado
+    public function myAttendances(Request $request)
+    {
+        try {
+            $user = $request->user();
+            $userId = $user->user_id;
+
+            $attendances = Attendances::whereHas('enrollment', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+                ->with([
+                    'attendanceState:attendance_state_id,attendance_state_name',
+                    'enrollment.subject:subject_id,subject_name',
+                    'enrollment.commission:commission_id,commission_name',
+                ])
+                ->orderBy('attendance_date', 'desc')
+                ->get();
+
+            $result = $attendances->map(function ($attendance) {
+                return [
+                    'attendance_id'        => $attendance->attendance_id,
+                    'attendance_date'      => $attendance->attendance_date,
+                    'subject_id'           => optional($attendance->enrollment->subject)->subject_id,
+                    'subject_name'         => optional($attendance->enrollment->subject)->subject_name,
+                    'commission_id'        => optional($attendance->enrollment->commission)->commission_id,
+                    'commission_name'      => optional($attendance->enrollment->commission)->commission_name,
+                    'attendance_state_id'  => optional($attendance->attendanceState)->attendance_state_id,
+                    'attendance_state_name' => optional($attendance->attendanceState)->attendance_state_name,
+                ];
+            });
+
+            return response()->json($result->values());
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'No se pudo obtener el historial de asistencias del estudiante',
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
