@@ -256,7 +256,7 @@ class AttendancesController extends Controller
         try {
             $user = $request->user();
             $userId = $user->user_id;
-
+            
             $attendances = Attendances::whereHas('enrollment', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
@@ -267,7 +267,7 @@ class AttendancesController extends Controller
                 ])
                 ->orderBy('attendance_date', 'desc')
                 ->get();
-
+                
             $result = $attendances->map(function ($attendance) {
                 return [
                     'attendance_id'        => $attendance->attendance_id,
@@ -286,6 +286,29 @@ class AttendancesController extends Controller
             return response()->json([
                 'message' => 'No se pudo obtener el historial de asistencias del estudiante',
                 'error'   => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * 
+     */
+    public function showAttendancesBySubjectIdAndCommissionIdAndDateWhereStateIsAbsent($subject_id, $commission_id, $date)
+    {
+        try {
+            $attendances = Attendances::whereHas('enrollment', function ($e) use ($subject_id, $commission_id) {
+                $e->where('subject_id', $subject_id)
+                    ->where('commission_id', $commission_id);
+            })
+                ->where('attendance_date', $date)
+                ->where('attendance_state_id', 3) // <- Ausente/Absent
+                ->with('enrollment.user:user_id,user_name,user_lastname')
+                ->get();
+            return response()->json($attendances);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Ocurrió un error al recuperar las inasistencias',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

@@ -84,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/previous-attendances/{subject_id}/{commission_id}/{date}', [AttendancesController::class, 'showAttendancesBySubjectIdAndCommissionIdAndDate'])->middleware('role:Admin|Teacher');
     Route::put('/update-multiple-attendances', [AttendancesController::class, 'updateMultipleAttendances'])->middleware('role:Admin|Teacher');
     Route::get('my-attendances', [AttendancesController::class, 'myAttendances'])->middleware('role:Student');
+    Route::get('/absent-attendances/{subject_id}/{commission_id}/{date}', [AttendancesController::class, 'showAttendancesBySubjectIdAndCommissionIdAndDateWhereStateIsAbsent'])->middleware('role:Admin|Teacher');
 
     /* Attendance States Routes */
     Route::prefix('attendance_states')->group(function () {
