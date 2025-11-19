@@ -18,7 +18,6 @@ class CommissionsController extends Controller
         try {
             $commissions = Commissions::all();
             return response()->json($commissions);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudieron obtener las comisiones',
@@ -49,13 +48,11 @@ class CommissionsController extends Controller
                 'message' => 'Comisión creada exitosamente',
                 'data' => $commission,
             ], 201);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudo crear la comisión, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo crear la comisión',
@@ -72,12 +69,10 @@ class CommissionsController extends Controller
         try {
             $commission = Commissions::findOrFail($id);
             return response()->json($commission);
-
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'La comisión solicitada no existe'
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo obtener la comisión',
@@ -109,18 +104,15 @@ class CommissionsController extends Controller
                 'message' => 'Comisión actualizada exitosamente',
                 'data' => $commission,
             ], 201);
-        
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar la comisión, verifique la validez de los datos enviados',
                 'error' => $e->validator->errors()
             ], 422);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'La comisión solicitada no existe'
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo actualizar la comisión',
@@ -141,17 +133,23 @@ class CommissionsController extends Controller
                 'message' => 'Comisión eliminada exitosamente',
                 'data' => $commission,
             ], 201);
-        
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'La comisión solicitada no existe'
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'No se pudo eliminar la comisión',
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+    public function bySubject($subjectId)
+    {
+        // IMPORTANTE: usar get(), no first()
+        $commissions = Commissions::where('subject_id', $subjectId)->get();
+
+        // Esto devuelve [] si no hay resultados, nunca null
+        return response()->json($commissions, 200);
     }
 }

@@ -50,7 +50,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('subjects-by-career/{career_id}', [SubjectsController::class, 'showSubjectsByCareer_id'])->middleware('role:Admin|Teacher|Student');
     Route::get('my-subjects', [EnrollmentsController::class, 'mySubjects'])->middleware('role:Student');
-
+    Route::get(
+        'subjects/{subject}/commissions',
+        [CommissionsController::class, 'bySubject']
+    )->middleware('role:Admin|Teacher|Student');
     /* Commissions Routes */
     Route::prefix('commissions')->group(function () {
         Route::get('/', [CommissionsController::class, 'index'])->middleware('role:Admin|Teacher|Student');
